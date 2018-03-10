@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Life is GifTastic</title>
+  <link rel="stylesheet" href="assets/GifTastic.css">
+  
+</head>
+<body>
+  <div class="container">
+    <h1>GifTastic Superheroes</h1>
+    <!-- Movies will get dumped here -->
+    <div id="gifs-view"></div>
+    <form id="gif-form">
+      <label for="gif-input">Add a Superhero</label>
+      <input type="text" id="gif-input"><br>
+      <!-- Button triggers new movie to be added -->
+      <input id="add-gif" type="submit" value="Submit">
+    </form>
+
+    <div id="gifs-appear-here">
+    </div>
+
+  </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script type="text/javascript">
+      // Initial array of movies
+      var gifs = [];
+      // Function for displaying movie data
+      function renderButtons() {
+        // Deleting the movie buttons prior to adding new movie buttons
+        // (this is necessary otherwise we will have repeat buttons)
+        $("#gifs-view").empty();
+        // Looping through the array of movies
+        for (var i = 0; i < gifs.length; i++) {
+          // Then dynamicaly generating buttons for each movie in the array.
+          // This code $("<button>") is all jQuery needs to create the start and end tag. (<button></button>)
+          var a = $("<button>");
+          // Adding a class
+          a.addClass("gif");
+          // Adding a data-attribute with a value of the movie at index i
+          a.attr("data-superhero", gifs[i]);
+          // Providing the button's text with a value of the movie at index i
+          a.text(gifs[i]);
+          // Adding the button to the HTML
+          $("#gifs-view").append(a);
+        }
+      }
+      // This function handles events where one button is clicked
+      $("#add-gif").on("click", function(event) {
+        // event.preventDefault() prevents the form from trying to submit itself.
+        // We're using a form so that the user can hit enter instead of clicking the button if they want
+        event.preventDefault();
+        // This line will grab the text from the input box
+        var gif = $("#gif-input").val().trim();
+        // The movie from the textbox is then added to our array
+        gifs.push(gif);
+        // calling renderButtons which handles the processing of our movie array
+        renderButtons();
+      });
+      // Calling the renderButtons function at least once to display the initial list of movies
+      renderButtons();
+
+
+
+
+
+ $("#gifs-view").on("click", ".gif", function() {
+  var superhero = $(this).data("superhero");
+    console.log($(this).data("superhero"));
+    console.log(this.getAttribute("data-superhero"));
+      var queryURL = "https://api.giphy.com/v1/gifs/search?q=" +
+        superhero + "&api_key=UjZHG73EmHs0HpFtMC7VJxlS3z7WgcnF&limit=10";
+
+      $.ajax({
+          url: queryURL,
+          method: "GET"
+        })
+        .then(function(response) {
+          console.log(queryURL);
+          console.log(response);
+
+          var results = response.data;
+
+          for (var i = 0; i < results.length; i++) {
+            var superheroDiv = $("<div class='item'>");
+
+            var rating = results[i].rating;
+
+            var p = $("<p>").text("Rating: " + rating);
+
+            var superheroImage = $("<img>");
+
+            superheroImage.attr("src", results[i].images.fixed_height.url);
+
+            superheroDiv.prepend(p);
+            superheroDiv.prepend(superheroImage);
+
+            $("#gifs-appear-here").prepend(superheroDiv);
+          }
+        });
+    });
+
+
+
+
+
+    </script>
+  </div>
+</body>
+</html>
